@@ -23,17 +23,17 @@ def get_episode_information():
     return data
 
 def get_episode_information_rihp():
-
-    NewsFeed = feedparser.parse("https://feeds.megaphone.fm/GLT4787413333")
-    title = NewsFeed.feed.title
-    print(len(NewsFeed.entries))
-
     data = []
-    for entry in NewsFeed.entries:
-        summary = entry['summary_detail']['value']
-        url = entry['links'][0]['href']
-        episode_title = entry['title']
-        data.append([title, summary, url, episode_title])
+
+    for NewsFeed in [feedparser.parse("https://feeds.megaphone.fm/GLT4787413333"), feedparser.parse("https://feeds.megaphone.fm/empirepodcast")]:
+        title = NewsFeed.feed.title
+        print(len(NewsFeed.entries))
+
+        for entry in NewsFeed.entries:
+            summary = entry['summary_detail']['value']
+            url = entry['links'][0]['href']
+            episode_title = entry['title']
+            data.append([title, summary, url, episode_title])
     return data
 
 
@@ -116,8 +116,8 @@ if __name__ == "__main__":
     save_to_database(episodes)
 
     episodes = get_episode_information_rihp()
-
     save_to_database(episodes)
+
     pod_data = read_from_database()
 
     yake_embeddings = get_yake_embeddings(pod_data)

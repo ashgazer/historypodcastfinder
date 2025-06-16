@@ -98,3 +98,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+function playNext() {
+  const nextIndex = currentEpisodeIndex + 1;
+  if (nextIndex < episodeQueue.length) {
+    playEpisodeAt(nextIndex);
+  }
+}
+
+function playPrevious() {
+  const prevIndex = currentEpisodeIndex - 1;
+  if (prevIndex >= 0) {
+    playEpisodeAt(prevIndex);
+  }
+}

@@ -1,2 +1,4 @@
 rake-nltk~=1.0.6
 feedparser~=6.0.11
+keybert
+flash

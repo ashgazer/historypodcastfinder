@@ -1,178 +1,142 @@
+let audioPlayer, playPauseBtn, progressBar, currentTimeEl, durationEl;
 let episodeQueue = [];
 let currentEpisodeIndex = -1;
 
-
-//document.addEventListener("DOMContentLoaded", () => {
-//  const searchInput = document.getElementById("searchBox");
-//
-//  // Listen for Enter key press
-//  searchInput.addEventListener("keydown", (e) => {
-//    if (e.key === "Enter" || e.keyCode === 13) {
-//      e.preventDefault(); // prevent form submit or page refresh
-//      searchEpisodes();
-//    }
-//  });
-//});
-
-
-
-function highlightMatch(text, query) {
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const regex = new RegExp(`(${escapedQuery})`, 'gi');
-  return text.replace(regex, '<mark class="bg-yellow-200 text-black font-semibold">$1</mark>');
-}
-
-async function searchEpisodes() {
-  const query = document.getElementById('searchBox').value.trim();
-  const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = '';
-
-  if (!query) return;
-
-  const res = await fetch(`/search?q=${encodeURIComponent(query)}`);
-  const episodes = await res.json();
-
-  if (episodes.length === 0) {
-    resultsDiv.innerHTML = '<p class="text-center text-gray-500">No results found.</p>';
-    episodeQueue = [];
-    return;
-  }
-
-  // Store the full episode list in the queue
-  episodeQueue = episodes;
-  currentEpisodeIndex = -1; // reset current
-
-  episodes.forEach((ep, index) => {
-  const highlightedTitle = highlightMatch(ep.title, query);
-  const highlightedSummary = highlightMatch(ep.summary, query);
-
-  const epDiv = document.createElement('div');
-  epDiv.className = 'bg-white p-6 rounded-xl shadow-md border border-gray-200 transition';
-  epDiv.id = `episode-${index}`; // <-- Add unique ID
-
-  epDiv.innerHTML = `
-    <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name} - ${highlightedTitle}</h3>
-    <p class="mb-4 text-gray-700">${highlightedSummary}</p>
-    <button onclick="playEpisodeAt(${index})"
-            class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">
-      ▶️ Play
-    </button>
-  `;
-
-  resultsDiv.appendChild(epDiv);
-});
-
-}
-
-
-function playEpisodeAt(index) {
-  const playerContainer = document.getElementById('playerContainer');
-  const audioPlayer = document.getElementById('unifiedPlayer');
-  const nowPlaying = document.getElementById('nowPlaying');
-
-  if (index < 0 || index >= episodeQueue.length) return;
-
-  const episode = episodeQueue[index];
-  audioPlayer.src = decodeURIComponent(episode.audio_url);
-  nowPlaying.textContent = `Now Playing:${episode.title}`;
-  playerContainer.classList.remove('hidden');
-  currentEpisodeIndex = index;
-  audioPlayer.play();
-
-  // Scroll and highlight the active card
-  const activeCard = document.getElementById(`episode-${index}`);
-  if (activeCard) {
-    activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // Remove highlight from all cards
-    document.querySelectorAll('[id^="episode-"]').forEach(card =>
-      card.classList.remove('ring', 'ring-blue-400')
-    );
-
-    // Highlight the current one
-    activeCard.classList.add('ring', 'ring-blue-400');
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBox");
-  const audioPlayer = document.getElementById("unifiedPlayer");
 
-  // Enter key support
+  // Assign global references
+  audioPlayer = document.getElementById("unifiedPlayer");
+  playPauseBtn = document.getElementById("playPauseBtn");
+  progressBar = document.getElementById("progressBar");
+  currentTimeEl = document.getElementById("currentTime");
+  durationEl = document.getElementById("duration");
+
+  // Enter key to search
   searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.keyCode === 13) {
+    if (e.key === "Enter") {
       e.preventDefault();
       searchEpisodes();
     }
   });
 
-  // Auto-play next episode when one ends
+  // Auto-play next
   audioPlayer.addEventListener("ended", () => {
-    const nextIndex = currentEpisodeIndex + 1;
-    if (nextIndex < episodeQueue.length) {
-      playEpisodeAt(nextIndex);
+    playNext();
+  });
+
+  // Update progress and time
+  audioPlayer.addEventListener("timeupdate", () => {
+    if (audioPlayer.duration) {
+      progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
     }
+  });
+
+  // Seek with progress bar
+  progressBar.addEventListener("input", () => {
+    if (audioPlayer.duration) {
+      audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
+    }
+  });
+
+  // Show duration once metadata is loaded
+  audioPlayer.addEventListener("loadedmetadata", () => {
+    durationEl.textContent = formatTime(audioPlayer.duration);
+    currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+    progressBar.value = 0;
+  });
+
+  audioPlayer.addEventListener("play", () => {
+    playPauseBtn.textContent = '⏸️';
+  });
+
+  audioPlayer.addEventListener("pause", () => {
+    playPauseBtn.textContent = '▶️';
   });
 });
 
-function playNext() {
-  const nextIndex = currentEpisodeIndex + 1;
-  if (nextIndex < episodeQueue.length) {
-    playEpisodeAt(nextIndex);
+// Format seconds to mm:ss
+function formatTime(time) {
+  const min = Math.floor(time / 60);
+  const sec = Math.floor(time % 60).toString().padStart(2, '0');
+  return `${min}:${sec}`;
+}
+
+function searchEpisodes() {
+  const query = document.getElementById("searchBox").value.trim();
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.innerHTML = '';
+
+  if (!query) return;
+
+  fetch(`/search?q=${encodeURIComponent(query)}`)
+    .then(res => res.json())
+    .then(episodes => {
+      if (episodes.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-center text-gray-500">No results found.</p>';
+        episodeQueue = [];
+        return;
+      }
+
+      episodeQueue = episodes;
+      currentEpisodeIndex = -1;
+
+      episodes.forEach((ep, index) => {
+        const div = document.createElement("div");
+        div.className = "bg-white p-6 rounded-xl shadow-md border border-gray-200";
+        div.id = `episode-${index}`;
+
+        div.innerHTML = `
+          <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${ep.title}</h3>
+          <p class="mb-4 text-gray-700">${ep.summary}</p>
+          <button onclick="playEpisodeAt(${index})" class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
+        `;
+
+        resultsDiv.appendChild(div);
+      });
+    });
+}
+
+function playEpisodeAt(index) {
+  if (index < 0 || index >= episodeQueue.length) return;
+
+  currentEpisodeIndex = index;
+  const ep = episodeQueue[index];
+
+  audioPlayer.src = ep.audio_url; // ✅ FIXED
+  document.getElementById("playerContainer").classList.remove("hidden");
+  document.getElementById("nowPlaying").textContent = `Now Playing: ${ep.title}`;
+  audioPlayer.play(); // ✅ this will now work
+
+  // Highlight current card
+  document.querySelectorAll('[id^="episode-"]').forEach(card =>
+    card.classList.remove('ring', 'ring-blue-400')
+  );
+  const active = document.getElementById(`episode-${index}`);
+  if (active) {
+    active.scrollIntoView({ behavior: "smooth", block: "center" });
+    active.classList.add('ring', 'ring-blue-400');
   }
 }
 
-function playPrevious() {
-  const prevIndex = currentEpisodeIndex - 1;
-  if (prevIndex >= 0) {
-    playEpisodeAt(prevIndex);
-  }
-}
-const audioPlayer = document.getElementById('unifiedPlayer');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const progressBar = document.getElementById('progressBar');
-const currentTimeEl = document.getElementById('currentTime');
-const durationEl = document.getElementById('duration');
 
 function togglePlayPause() {
   if (audioPlayer.paused) {
     audioPlayer.play();
-    playPauseBtn.textContent = '⏸️';
   } else {
     audioPlayer.pause();
-    playPauseBtn.textContent = '▶️';
   }
 }
 
-// Update progress bar and time display
-audioPlayer.addEventListener('timeupdate', () => {
-  if (!audioPlayer.duration) return;
-
-  const current = audioPlayer.currentTime;
-  const duration = audioPlayer.duration;
-  progressBar.value = (current / duration) * 100;
-  currentTimeEl.textContent = formatTime(current);
-  durationEl.textContent = formatTime(duration);
-});
-
-// Seek
-progressBar.addEventListener('input', () => {
-  if (!audioPlayer.duration) return;
-  audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
-});
-
-// Format time
-function formatTime(time) {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60).toString().padStart(2, '0');
-  return `${minutes}:${seconds}`;
+function playNext() {
+  if (currentEpisodeIndex + 1 < episodeQueue.length) {
+    playEpisodeAt(currentEpisodeIndex + 1);
+  }
 }
 
-// Sync UI on play/pause
-audioPlayer.addEventListener('play', () => playPauseBtn.textContent = '⏸️');
-audioPlayer.addEventListener('pause', () => playPauseBtn.textContent = '▶️');
-
-audioPlayer.addEventListener('loadedmetadata', () => {
-  durationEl.textContent = formatTime(audioPlayer.duration);
-  progressBar.value = 0;
-});
+function playPrevious() {
+  if (currentEpisodeIndex > 0) {
+    playEpisodeAt(currentEpisodeIndex - 1);
+  }
+}

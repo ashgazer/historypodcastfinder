@@ -126,10 +126,10 @@ if __name__ == "__main__":
     episodes = get_episode_information_rihp()
     save_to_database(episodes)
 
-    pod_data = read_from_database()
-
-    yake_embeddings = get_yake_embeddings(pod_data)
-    save_yake_embeddings(yake_embeddings)
-
-    bert_embeddings = get_bert_embeddings(pod_data)
-    save_embeddings(bert_embeddings)
+    # pod_data = read_from_database()
+    #
+    # yake_embeddings = get_yake_embeddings(pod_data)
+    # save_yake_embeddings(yake_embeddings)
+    #
+    # bert_embeddings = get_bert_embeddings(pod_data)
+    # save_embeddings(bert_embeddings)

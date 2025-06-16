@@ -10,7 +10,11 @@ def get_episode_information():
     # NewsFeed =
     data = []
 
-    for NewsFeed in [feedparser.parse("https://podcasts.files.bbci.co.uk/p07mdbhg.rss"),feedparser.parse("https://podcasts.files.bbci.co.uk/b006qykl.rss")]:
+    for NewsFeed in [feedparser.parse("https://podcasts.files.bbci.co.uk/p07mdbhg.rss"),
+                     feedparser.parse("https://podcasts.files.bbci.co.uk/b006qykl.rss"),
+                     feedparser.parse("https://podcasts.files.bbci.co.uk/p0683ms3.rss"),
+
+                     ]:
         title = NewsFeed.feed.title
         print(len(NewsFeed.entries))
 
@@ -25,7 +29,11 @@ def get_episode_information():
 def get_episode_information_rihp():
     data = []
 
-    for NewsFeed in [feedparser.parse("https://feeds.megaphone.fm/GLT4787413333"), feedparser.parse("https://feeds.megaphone.fm/empirepodcast")]:
+    for NewsFeed in [feedparser.parse("https://feeds.megaphone.fm/GLT4787413333"),
+                     feedparser.parse("https://feeds.megaphone.fm/empirepodcast"),
+                     feedparser.parse("https://feeds.megaphone.fm/NSR8236478683"),
+                     feedparser.parse("https://feeds.megaphone.fm/TECO4776134998"),
+                     ]:
         title = NewsFeed.feed.title
         print(len(NewsFeed.entries))
 

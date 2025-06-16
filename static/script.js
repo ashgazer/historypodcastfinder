@@ -43,23 +43,25 @@ async function searchEpisodes() {
   currentEpisodeIndex = -1; // reset current
 
   episodes.forEach((ep, index) => {
-    const highlightedTitle = highlightMatch(ep.title, query);
-    const highlightedSummary = highlightMatch(ep.summary, query);
+  const highlightedTitle = highlightMatch(ep.title, query);
+  const highlightedSummary = highlightMatch(ep.summary, query);
 
-    const epDiv = document.createElement('div');
-    epDiv.className = 'bg-white p-6 rounded-xl shadow-md border border-gray-200';
+  const epDiv = document.createElement('div');
+  epDiv.className = 'bg-white p-6 rounded-xl shadow-md border border-gray-200 transition';
+  epDiv.id = `episode-${index}`; // <-- Add unique ID
 
-    epDiv.innerHTML = `
-      <h3 class="text-xl font-semibold mb-2 text-blue-800">${highlightedTitle}</h3>
-      <p class="mb-4 text-gray-700">${highlightedSummary}</p>
-      <button onclick="playEpisodeAt(${index})"
-              class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">
-        ▶️ Play
-      </button>
-    `;
+  epDiv.innerHTML = `
+    <h3 class="text-xl font-semibold mb-2 text-blue-800">${highlightedTitle}</h3>
+    <p class="mb-4 text-gray-700">${highlightedSummary}</p>
+    <button onclick="playEpisodeAt(${index})"
+            class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">
+      ▶️ Play
+    </button>
+  `;
 
-    resultsDiv.appendChild(epDiv);
-  });
+  resultsDiv.appendChild(epDiv);
+});
+
 }
 
 
@@ -76,6 +78,20 @@ function playEpisodeAt(index) {
   playerContainer.classList.remove('hidden');
   currentEpisodeIndex = index;
   audioPlayer.play();
+
+  // Scroll and highlight the active card
+  const activeCard = document.getElementById(`episode-${index}`);
+  if (activeCard) {
+    activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Remove highlight from all cards
+    document.querySelectorAll('[id^="episode-"]').forEach(card =>
+      card.classList.remove('ring', 'ring-blue-400')
+    );
+
+    // Highlight the current one
+    activeCard.classList.add('ring', 'ring-blue-400');
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

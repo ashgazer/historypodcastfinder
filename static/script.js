@@ -51,7 +51,7 @@ async function searchEpisodes() {
   epDiv.id = `episode-${index}`; // <-- Add unique ID
 
   epDiv.innerHTML = `
-    <h3 class="text-xl font-semibold mb-2 text-blue-800">${highlightedTitle}</h3>
+    <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name} - ${highlightedTitle}</h3>
     <p class="mb-4 text-gray-700">${highlightedSummary}</p>
     <button onclick="playEpisodeAt(${index})"
             class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">
@@ -74,7 +74,7 @@ function playEpisodeAt(index) {
 
   const episode = episodeQueue[index];
   audioPlayer.src = decodeURIComponent(episode.audio_url);
-  nowPlaying.textContent = `Now Playing: ${episode.title}`;
+  nowPlaying.textContent = `Now Playing:${episode.title}`;
   playerContainer.classList.remove('hidden');
   currentEpisodeIndex = index;
   audioPlayer.play();

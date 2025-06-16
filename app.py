@@ -10,13 +10,13 @@ def query_episodes(search_term):
     c = conn.cursor()
     like_term = f'%{search_term}%'
     c.execute("""
-        SELECT title, summary, url
+        SELECT title, summary, url, show_name
         FROM episodes
         WHERE title LIKE ? OR summary LIKE ?
     """, (like_term, like_term))
     results = c.fetchall()
     conn.close()
-    return [{"title": r[0], "summary": r[1], "audio_url": r[2]} for r in results]
+    return [{"title": r[0], "summary": r[1], "audio_url": r[2], "show_name": r[3]} for r in results]
 
 @app.route('/')
 def index():

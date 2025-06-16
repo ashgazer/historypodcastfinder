@@ -2,6 +2,15 @@ let audioPlayer, playPauseBtn, progressBar, currentTimeEl, durationEl;
 let episodeQueue = [];
 let currentEpisodeIndex = -1;
 
+function highlightMatch(text, query) {
+  if (!query) return text;
+
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape regex
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
+  return text.replace(regex, '<mark class="bg-yellow-200 text-black font-semibold">$1</mark>');
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBox");
 
@@ -87,11 +96,15 @@ function searchEpisodes() {
         div.className = "bg-white p-6 rounded-xl shadow-md border border-gray-200";
         div.id = `episode-${index}`;
 
-        div.innerHTML = `
-          <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${ep.title}</h3>
-          <p class="mb-4 text-gray-700">${ep.summary}</p>
-          <button onclick="playEpisodeAt(${index})" class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
-        `;
+     const highlightedTitle = highlightMatch(ep.title, query);
+const highlightedSummary = highlightMatch(ep.summary, query);
+
+div.innerHTML = `
+  <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${highlightedTitle}</h3>
+  <p class="mb-4 text-gray-700">${highlightedSummary}</p>
+  <button onclick="playEpisodeAt(${index})" class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
+`;
+
 
         resultsDiv.appendChild(div);
       });

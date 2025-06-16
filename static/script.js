@@ -1,21 +1,22 @@
-function highlightMatch(text, query) {
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape regex
-  const regex = new RegExp(`(${escapedQuery})`, 'gi');
-  return text.replace(regex, '<mark class="bg-yellow-200 text-black font-semibold">$1</mark>');
-}
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBox");
 
   // Listen for Enter key press
   searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault(); // prevent form submit or page refresh
       searchEpisodes();
     }
   });
 });
+
+
+
+function highlightMatch(text, query) {
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
+  return text.replace(regex, '<mark class="bg-yellow-200 text-black font-semibold">$1</mark>');
+}
 
 async function searchEpisodes() {
   const query = document.getElementById('searchBox').value.trim();
@@ -32,7 +33,7 @@ async function searchEpisodes() {
     return;
   }
 
-  episodes.forEach(ep => {
+  episodes.forEach((ep, index) => {
     const highlightedTitle = highlightMatch(ep.title, query);
     const highlightedSummary = highlightMatch(ep.summary, query);
 
@@ -42,9 +43,23 @@ async function searchEpisodes() {
     epDiv.innerHTML = `
       <h3 class="text-xl font-semibold mb-2 text-blue-800">${highlightedTitle}</h3>
       <p class="mb-4 text-gray-700">${highlightedSummary}</p>
-      <audio class="w-full" controls src="${ep.audio_url}"></audio>
+      <button onclick="playEpisode('${encodeURIComponent(ep.audio_url)}', ${JSON.stringify(ep.title).replace(/"/g, '&quot;')})"
+              class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">
+        ▶️ Play
+      </button>
     `;
 
     resultsDiv.appendChild(epDiv);
   });
+}
+
+function playEpisode(audioUrl, title) {
+  const playerContainer = document.getElementById('playerContainer');
+  const audioPlayer = document.getElementById('unifiedPlayer');
+  const nowPlaying = document.getElementById('nowPlaying');
+
+  audioPlayer.src = decodeURIComponent(audioUrl);
+  nowPlaying.textContent = `Now Playing: ${title}`;
+  playerContainer.classList.remove('hidden');
+  audioPlayer.play();
 }

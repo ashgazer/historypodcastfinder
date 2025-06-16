@@ -8,7 +8,7 @@ DB_PATH = 'podcast.db'
 def query_episodes(search_term):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    like_term = f'%{search_term}%'
+    like_term = f'%{search_term} %'
     c.execute("""
         SELECT title, summary, url, show_name
         FROM episodes
@@ -32,4 +32,4 @@ def search():
     return jsonify(results)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5001)

@@ -143,8 +143,12 @@ function togglePlayPause() {
 }
 
 function playNext() {
-  if (currentEpisodeIndex + 1 < episodeQueue.length) {
-    playEpisodeAt(currentEpisodeIndex + 1);
+  const nextIndex = currentEpisodeIndex + 1;
+
+  if (nextIndex < episodeQueue.length) {
+    playEpisodeAt(nextIndex);
+  } else {
+    playEpisodeAt(0); // Loop back to first
   }
 }
 

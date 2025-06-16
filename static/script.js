@@ -1,3 +1,7 @@
+let episodeQueue = [];
+let currentEpisodeIndex = -1;
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBox");
 
@@ -30,8 +34,13 @@ async function searchEpisodes() {
 
   if (episodes.length === 0) {
     resultsDiv.innerHTML = '<p class="text-center text-gray-500">No results found.</p>';
+    episodeQueue = [];
     return;
   }
+
+  // Store the full episode list in the queue
+  episodeQueue = episodes;
+  currentEpisodeIndex = -1; // reset current
 
   episodes.forEach((ep, index) => {
     const highlightedTitle = highlightMatch(ep.title, query);
@@ -43,7 +52,7 @@ async function searchEpisodes() {
     epDiv.innerHTML = `
       <h3 class="text-xl font-semibold mb-2 text-blue-800">${highlightedTitle}</h3>
       <p class="mb-4 text-gray-700">${highlightedSummary}</p>
-      <button onclick="playEpisode('${encodeURIComponent(ep.audio_url)}', ${JSON.stringify(ep.title).replace(/"/g, '&quot;')})"
+      <button onclick="playEpisodeAt(${index})"
               class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">
         ▶️ Play
       </button>
@@ -53,13 +62,39 @@ async function searchEpisodes() {
   });
 }
 
-function playEpisode(audioUrl, title) {
+
+function playEpisodeAt(index) {
   const playerContainer = document.getElementById('playerContainer');
   const audioPlayer = document.getElementById('unifiedPlayer');
   const nowPlaying = document.getElementById('nowPlaying');
 
-  audioPlayer.src = decodeURIComponent(audioUrl);
-  nowPlaying.textContent = `Now Playing: ${title}`;
+  if (index < 0 || index >= episodeQueue.length) return;
+
+  const episode = episodeQueue[index];
+  audioPlayer.src = decodeURIComponent(episode.audio_url);
+  nowPlaying.textContent = `Now Playing: ${episode.title}`;
   playerContainer.classList.remove('hidden');
+  currentEpisodeIndex = index;
   audioPlayer.play();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("searchBox");
+  const audioPlayer = document.getElementById("unifiedPlayer");
+
+  // Enter key support
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault();
+      searchEpisodes();
+    }
+  });
+
+  // Auto-play next episode when one ends
+  audioPlayer.addEventListener("ended", () => {
+    const nextIndex = currentEpisodeIndex + 1;
+    if (nextIndex < episodeQueue.length) {
+      playEpisodeAt(nextIndex);
+    }
+  });
+});

@@ -2,17 +2,17 @@ let episodeQueue = [];
 let currentEpisodeIndex = -1;
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.getElementById("searchBox");
-
-  // Listen for Enter key press
-  searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.keyCode === 13) {
-      e.preventDefault(); // prevent form submit or page refresh
-      searchEpisodes();
-    }
-  });
-});
+//document.addEventListener("DOMContentLoaded", () => {
+//  const searchInput = document.getElementById("searchBox");
+//
+//  // Listen for Enter key press
+//  searchInput.addEventListener("keydown", (e) => {
+//    if (e.key === "Enter" || e.keyCode === 13) {
+//      e.preventDefault(); // prevent form submit or page refresh
+//      searchEpisodes();
+//    }
+//  });
+//});
 
 
 

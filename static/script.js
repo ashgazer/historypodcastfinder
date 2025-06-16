@@ -128,3 +128,51 @@ function playPrevious() {
     playEpisodeAt(prevIndex);
   }
 }
+const audioPlayer = document.getElementById('unifiedPlayer');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const progressBar = document.getElementById('progressBar');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+
+function togglePlayPause() {
+  if (audioPlayer.paused) {
+    audioPlayer.play();
+    playPauseBtn.textContent = '⏸️';
+  } else {
+    audioPlayer.pause();
+    playPauseBtn.textContent = '▶️';
+  }
+}
+
+// Update progress bar and time display
+audioPlayer.addEventListener('timeupdate', () => {
+  if (!audioPlayer.duration) return;
+
+  const current = audioPlayer.currentTime;
+  const duration = audioPlayer.duration;
+  progressBar.value = (current / duration) * 100;
+  currentTimeEl.textContent = formatTime(current);
+  durationEl.textContent = formatTime(duration);
+});
+
+// Seek
+progressBar.addEventListener('input', () => {
+  if (!audioPlayer.duration) return;
+  audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
+});
+
+// Format time
+function formatTime(time) {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+// Sync UI on play/pause
+audioPlayer.addEventListener('play', () => playPauseBtn.textContent = '⏸️');
+audioPlayer.addEventListener('pause', () => playPauseBtn.textContent = '▶️');
+
+audioPlayer.addEventListener('loadedmetadata', () => {
+  durationEl.textContent = formatTime(audioPlayer.duration);
+  progressBar.value = 0;
+});

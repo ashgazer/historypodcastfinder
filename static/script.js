@@ -1,3 +1,11 @@
+function highlightMatch(text, query) {
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape regex
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
+  return text.replace(regex, '<mark class="bg-yellow-200 text-black font-semibold">$1</mark>');
+}
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBox");
 
@@ -25,12 +33,15 @@ async function searchEpisodes() {
   }
 
   episodes.forEach(ep => {
+    const highlightedTitle = highlightMatch(ep.title, query);
+    const highlightedSummary = highlightMatch(ep.summary, query);
+
     const epDiv = document.createElement('div');
     epDiv.className = 'bg-white p-6 rounded-xl shadow-md border border-gray-200';
 
     epDiv.innerHTML = `
-      <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.title}</h3>
-      <p class="mb-4 text-gray-700">${ep.summary}</p>
+      <h3 class="text-xl font-semibold mb-2 text-blue-800">${highlightedTitle}</h3>
+      <p class="mb-4 text-gray-700">${highlightedSummary}</p>
       <audio class="w-full" controls src="${ep.audio_url}"></audio>
     `;
 

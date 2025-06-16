@@ -1,3 +1,14 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("searchBox");
+
+  // Listen for Enter key press
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      searchEpisodes();
+    }
+  });
+});
+
 async function searchEpisodes() {
   const query = document.getElementById('searchBox').value.trim();
   const resultsDiv = document.getElementById('results');

@@ -1,27 +1,24 @@
 let audioPlayer, playPauseBtn, progressBar, currentTimeEl, durationEl;
 let episodeQueue = [];
 let currentEpisodeIndex = -1;
+let currentEpisodeId = null;
 
 function highlightMatch(text, query) {
   if (!query) return text;
-
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape regex
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
   return text.replace(regex, '<mark class="bg-yellow-200 text-black font-semibold">$1</mark>');
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBox");
 
-  // Assign global references
   audioPlayer = document.getElementById("unifiedPlayer");
   playPauseBtn = document.getElementById("playPauseBtn");
   progressBar = document.getElementById("progressBar");
   currentTimeEl = document.getElementById("currentTime");
   durationEl = document.getElementById("duration");
 
-  // Enter key to search
   searchInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -29,27 +26,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Auto-play next
   audioPlayer.addEventListener("ended", () => {
     playNext();
   });
 
-  // Update progress and time
+  // 🧠 Save position on update
   audioPlayer.addEventListener("timeupdate", () => {
     if (audioPlayer.duration) {
       progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
       currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+
+      if (currentEpisodeId && !audioPlayer.paused) {
+        localStorage.setItem(`position-${currentEpisodeId}`, audioPlayer.currentTime);
+      }
     }
   });
 
-  // Seek with progress bar
+  // Seek
   progressBar.addEventListener("input", () => {
     if (audioPlayer.duration) {
       audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
     }
   });
 
-  // Show duration once metadata is loaded
   audioPlayer.addEventListener("loadedmetadata", () => {
     durationEl.textContent = formatTime(audioPlayer.duration);
     currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
@@ -65,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Format seconds to mm:ss
+// Format time
 function formatTime(time) {
   const min = Math.floor(time / 60);
   const sec = Math.floor(time % 60).toString().padStart(2, '0');
@@ -96,16 +95,14 @@ function searchEpisodes() {
         div.className = "bg-white p-6 rounded-xl shadow-md border border-gray-200";
         div.id = `episode-${index}`;
 
-     const highlightedTitle = highlightMatch(ep.title, query);
-const highlightedSummary = highlightMatch(ep.summary, query);
+        const highlightedTitle = highlightMatch(ep.title, query);
+        const highlightedSummary = highlightMatch(ep.summary, query);
 
-div.innerHTML = `
-  <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${highlightedTitle}</h3>
-  <p class="mb-4 text-gray-700">${highlightedSummary}</p>
-  <button onclick="playEpisodeAt(${index})" class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
-`;
-
-
+        div.innerHTML = `
+  		<h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${highlightedTitle}</h3>
+  		<p class="mb-4 text-gray-700">${highlightedSummary}</p>
+          <button onclick="playEpisodeAt(${index})" class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
+        `;
         resultsDiv.appendChild(div);
       });
     });
@@ -116,13 +113,26 @@ function playEpisodeAt(index) {
 
   currentEpisodeIndex = index;
   const ep = episodeQueue[index];
+  currentEpisodeId = ep.audio_url; // use audio_url as unique key
 
-  audioPlayer.src = ep.audio_url; // ✅ FIXED
+  audioPlayer.src = ep.audio_url;
   document.getElementById("playerContainer").classList.remove("hidden");
   document.getElementById("nowPlaying").textContent = `Now Playing: ${ep.title}`;
-  audioPlayer.play(); // ✅ this will now work
 
-  // Highlight current card
+  // ⏪ Restore saved time if available
+  const savedTime = localStorage.getItem(`position-${currentEpisodeId}`);
+  if (savedTime) {
+    audioPlayer.addEventListener("loadedmetadata", () => {
+      if (audioPlayer.duration > savedTime) {
+        audioPlayer.currentTime = parseFloat(savedTime);
+      }
+      audioPlayer.play();
+    }, { once: true });
+  } else {
+    audioPlayer.play();
+  }
+
+  // Highlight card
   document.querySelectorAll('[id^="episode-"]').forEach(card =>
     card.classList.remove('ring', 'ring-blue-400')
   );
@@ -132,7 +142,6 @@ function playEpisodeAt(index) {
     active.classList.add('ring', 'ring-blue-400');
   }
 }
-
 
 function togglePlayPause() {
   if (audioPlayer.paused) {
@@ -144,11 +153,10 @@ function togglePlayPause() {
 
 function playNext() {
   const nextIndex = currentEpisodeIndex + 1;
-
   if (nextIndex < episodeQueue.length) {
     playEpisodeAt(nextIndex);
   } else {
-    playEpisodeAt(0); // Loop back to first
+    playEpisodeAt(0);
   }
 }
 

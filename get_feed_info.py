@@ -46,6 +46,24 @@ def get_episode_information_rihp():
     return data
 
 
+def get_episode_information_acast():
+    data = []
+
+    for NewsFeed in [
+                     feedparser.parse("https://feeds.acast.com/public/shows/c939f8d1-c4bc-478e-8bb9-e5343f9a7ab5"), # history hit
+                     ]:
+        title = NewsFeed.feed.title
+        print(len(NewsFeed.entries))
+
+        for entry in NewsFeed.entries:
+            summary = entry['summary_detail']['value']
+            url = entry['links'][0]['href']
+            episode_title = entry['title']
+            data.append([title, summary, url, episode_title])
+    return data
+
+
+
 def save_to_database(episodes):
     conn = sqlite3.connect('podcast.db')
     c = conn.cursor()
@@ -125,6 +143,9 @@ if __name__ == "__main__":
     save_to_database(episodes)
 
     episodes = get_episode_information_rihp()
+    save_to_database(episodes)
+
+    episodes = get_episode_information_acast()
     save_to_database(episodes)
 
     # pod_data = read_from_database()

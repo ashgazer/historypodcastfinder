@@ -1,6 +1,7 @@
 ### Next to do
 - [ ] volume up and down
-
+- [ ] refresh feeds
+- [ ] add date
 
 
 ### update - 2025-06-17

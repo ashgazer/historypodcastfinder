@@ -1,3 +1,5 @@
+import time
+
 import feedparser
 import sqlite3
 # from keybert import KeyBERT
@@ -7,7 +9,6 @@ import json
 
 
 def get_episode_information():
-    # NewsFeed =
     data = []
 
     for NewsFeed in [feedparser.parse("https://podcasts.files.bbci.co.uk/p07mdbhg.rss"),
@@ -19,10 +20,12 @@ def get_episode_information():
         print(len(NewsFeed.entries))
 
         for entry in NewsFeed.entries:
+            published_time = entry['published_parsed']
+            published_str = time.strftime('%Y-%m-%d %H:%M:%S', published_time)
             summary = entry['summary']
             url = entry['ppg_enclosuresecure']['url']
             episode_title = entry['title']
-            data.append([title, summary, url, episode_title])
+            data.append([title, summary, url, episode_title, published_str])
 
     return data
 
@@ -39,10 +42,13 @@ def get_episode_information_rihp():
         print(len(NewsFeed.entries))
 
         for entry in NewsFeed.entries:
+            published_time = entry['published_parsed']
+            published_str = time.strftime('%Y-%m-%d %H:%M:%S', published_time)
+
             summary = entry['summary_detail']['value']
             url = entry['links'][-1]['href']
             episode_title = entry['title']
-            data.append([title, summary, url, episode_title])
+            data.append([title, summary, url, episode_title, published_str])
     return data
 
 
@@ -56,10 +62,14 @@ def get_episode_information_acast():
         print(len(NewsFeed.entries))
 
         for entry in NewsFeed.entries:
+
+            published_time = entry['published_parsed']
+            published_str = time.strftime('%Y-%m-%d %H:%M:%S', published_time)
+
             summary = entry['summary_detail']['value']
             url = entry['links'][0]['href']
             episode_title = entry['title']
-            data.append([title, summary, url, episode_title])
+            data.append([title, summary, url, episode_title, published_str])
     return data
 
 
@@ -68,8 +78,8 @@ def save_to_database(episodes):
     conn = sqlite3.connect('podcast.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS episodes
-                 (        id INTEGER PRIMARY KEY AUTOINCREMENT,show_name TEXT,summary TEXT, url TEXT, title TEXT)''')
-    c.executemany('INSERT INTO episodes (show_name,summary, url, title) VALUES (?,?, ?, ?)', episodes)
+                 (        id INTEGER PRIMARY KEY AUTOINCREMENT,show_name TEXT,summary TEXT, url TEXT, title TEXT,  published TEXT)''')
+    c.executemany('INSERT INTO episodes (show_name,summary, url, title, published) VALUES (?,?, ?, ?, ?)', episodes)
     conn.commit()
     conn.close()
 

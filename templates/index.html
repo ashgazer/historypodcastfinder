@@ -44,12 +44,15 @@
 
       <div class="flex flex-wrap items-center justify-center gap-3 w-full sm:w-auto">
         <button onclick="playPrevious()" class="bg-gray-100 p-2 rounded hover:bg-gray-200" title="Previous">⏮</button>
+        <button onclick="skipBackward()" class="bg-gray-100 p-2 rounded hover:bg-gray-200" title="Back 10s">⏪ 10s</button>
         <button id="playPauseBtn" onclick="togglePlayPause()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold">▶️</button>
+        <button onclick="skipForward()" class="bg-gray-100 p-2 rounded hover:bg-gray-200" title="Forward 10s">10s ⏩</button>
         <button onclick="playNext()" class="bg-gray-100 p-2 rounded hover:bg-gray-200" title="Next">⏭</button>
         <span id="currentTime" class="text-xs text-gray-600">0:00</span>
         <input type="range" id="progressBar" value="0" min="0" max="100" class="w-full sm:w-40 accent-blue-600 h-2 rounded-lg cursor-pointer" />
         <span id="duration" class="text-xs text-gray-600">0:00</span>
       </div>
+
     </div>
 
     <audio id="unifiedPlayer" class="hidden"></audio>

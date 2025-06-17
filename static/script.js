@@ -165,3 +165,18 @@ function playPrevious() {
     playEpisodeAt(currentEpisodeIndex - 1);
   }
 }
+
+function skipForward() {
+  const audio = document.getElementById('unifiedPlayer');
+  if (audio) {
+    audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+  }
+}
+
+function skipBackward() {
+  const audio = document.getElementById('unifiedPlayer');
+  if (audio) {
+    audio.currentTime = Math.max(0, audio.currentTime - 10);
+  }
+}
+

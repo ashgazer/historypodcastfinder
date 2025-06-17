@@ -1,7 +1,7 @@
 import feedparser
 import sqlite3
-from keybert import KeyBERT
-import yake
+# from keybert import KeyBERT
+# import yake
 import json
 
 
@@ -29,17 +29,18 @@ def get_episode_information():
 def get_episode_information_rihp():
     data = []
 
-    for NewsFeed in [feedparser.parse("https://feeds.megaphone.fm/GLT4787413333"),
-                     feedparser.parse("https://feeds.megaphone.fm/empirepodcast"),
-                     feedparser.parse("https://feeds.megaphone.fm/NSR8236478683"),
-                     feedparser.parse("https://feeds.megaphone.fm/TECO4776134998"),
+    for NewsFeed in [
+                    feedparser.parse("https://feeds.megaphone.fm/GLT4787413333"), # rhip
+                     feedparser.parse("https://feeds.megaphone.fm/empirepodcast"), # empire
+                     feedparser.parse("https://feeds.megaphone.fm/NSR8236478683"), # short
+                     feedparser.parse("https://feeds.megaphone.fm/TECO4776134998"), # what the brit
                      ]:
         title = NewsFeed.feed.title
         print(len(NewsFeed.entries))
 
         for entry in NewsFeed.entries:
             summary = entry['summary_detail']['value']
-            url = entry['links'][0]['href']
+            url = entry['links'][-1]['href']
             episode_title = entry['title']
             data.append([title, summary, url, episode_title])
     return data

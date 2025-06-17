@@ -90,21 +90,35 @@ function searchEpisodes() {
       episodeQueue = episodes;
       currentEpisodeIndex = -1;
 
-      episodes.forEach((ep, index) => {
-        const div = document.createElement("div");
-        div.className = "bg-white p-6 rounded-xl shadow-md border border-gray-200";
-        div.id = `episode-${index}`;
+episodes.forEach((ep, index) => {
+  const div = document.createElement("div");
+  div.className = "bg-white p-6 rounded-xl shadow-md border border-gray-200";
+  div.id = `episode-${index}`;
 
-        const highlightedTitle = highlightMatch(ep.title, query);
-        const highlightedSummary = highlightMatch(ep.summary, query);
+  const query = document.getElementById("searchBox").value.trim();
 
-        div.innerHTML = `
-  		<h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${highlightedTitle}</h3>
-  		<p class="mb-4 text-gray-700">${highlightedSummary}</p>
-          <button onclick="playEpisodeAt(${index})" class="px-4 py-2 mt-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
-        `;
-        resultsDiv.appendChild(div);
-      });
+  const title = ep.title || '';
+  const summary = ep.summary || '';
+  const highlightedTitle = highlightMatch(title, query);
+
+  const truncatedSummaryText = summary.length > 250 ? summary.slice(0, 250) + "..." : summary;
+  const highlightedShort = highlightMatch(truncatedSummaryText, query);
+  const highlightedFull = highlightMatch(summary, query);
+
+  div.innerHTML = `
+    <h3 class="text-xl font-semibold mb-2 text-blue-800">${ep.show_name || ''} - ${highlightedTitle}</h3>
+    <div class="text-gray-700 mb-4">
+      <div class="summary-short">${highlightedShort}</div>
+      <div class="summary-full hidden">${highlightedFull}</div>
+      ${summary.length > 250
+        ? '<button onclick="toggleFullSummary(this)" class="text-sm text-blue-600 hover:underline mt-2">Show More</button>'
+        : ''}
+    </div>
+    <button onclick="playEpisodeAt(${index})" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow-sm">▶️ Play</button>
+  `;
+  resultsDiv.appendChild(div);
+});
+
     });
 }
 
@@ -180,3 +194,17 @@ function skipBackward() {
   }
 }
 
+function toggleFullSummary(button) {
+  const shortEl = button.parentElement.querySelector('.summary-short');
+  const fullEl = button.parentElement.querySelector('.summary-full');
+
+  if (fullEl.classList.contains('hidden')) {
+    shortEl.classList.add('hidden');
+    fullEl.classList.remove('hidden');
+    button.textContent = 'Show Less';
+  } else {
+    fullEl.classList.add('hidden');
+    shortEl.classList.remove('hidden');
+    button.textContent = 'Show More';
+  }
+}

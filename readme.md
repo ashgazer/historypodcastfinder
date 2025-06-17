@@ -1,7 +1,12 @@
 ### Next to do
 - [ ] volume up and down
-- [ ] minimise text
 - [ ] order episodes by date
+- [ ] move feeds to yaml file
+- [ ] Add date field for sorting podcasts
 
-### update - 2025-06-17:18:08
+
+
+### update - 2025-06-17
 - [x] skip back/forward 10 seconds
+- [x] minimise text
+

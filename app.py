@@ -13,6 +13,7 @@ def query_episodes(search_term):
         SELECT title, summary, url, show_name
         FROM episodes
         WHERE title LIKE ? OR summary LIKE ?
+        order by published
     """, (like_term, like_term))
     results = c.fetchall()
     conn.close()

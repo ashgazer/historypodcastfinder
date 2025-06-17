@@ -1,8 +1,6 @@
 ### Next to do
 - [ ] volume up and down
-- [ ] order episodes by date
 - [ ] move feeds to yaml file
-- [ ] Add date field for sorting podcasts
 
 
 
@@ -10,4 +8,7 @@
 - [x] skip back/forward 10 seconds
 - [x] minimise text
 - [x] remove radio edit episodes of you're dead to me 
+- [x] Add date field for sorting podcasts
+- [x] order episodes by date
+
 

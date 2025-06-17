@@ -138,9 +138,22 @@ def read_embeddings():
     conn.close()
     return rows
 
+def remove_radio_edit_episodes_from_your_dead_to_me():
+    conn = sqlite3.connect('podcast.db')
+    c = conn.cursor()
+
+    c.execute("""
+        DELETE FROM episodes 
+        WHERE title LIKE '%radio edit%' AND show_name = 'You''re Dead to Me'
+    """)
+
+    conn.commit()  # You must commit to persist changes
+    conn.close()
+
 if __name__ == "__main__":
     episodes = get_episode_information()
     save_to_database(episodes)
+    remove_radio_edit_episodes_from_your_dead_to_me()
 
     episodes = get_episode_information_rihp()
     save_to_database(episodes)

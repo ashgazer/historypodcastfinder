@@ -1,6 +1,5 @@
 ### Next to do
 - [ ] volume up and down
-- [ ] move feeds to yaml file
 
 
 
@@ -10,5 +9,6 @@
 - [x] remove radio edit episodes of you're dead to me 
 - [x] Add date field for sorting podcasts
 - [x] order episodes by date
+- [x] move feeds to yaml file
 
 

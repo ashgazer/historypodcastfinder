@@ -6,16 +6,13 @@ import sqlite3
 # import yake
 import json
 
-
+import yaml
+with open("feeds.yml", "r") as file:
+    FEEDS = yaml.safe_load(file)
 
 def get_episode_information():
     data = []
-
-    for NewsFeed in [feedparser.parse("https://podcasts.files.bbci.co.uk/p07mdbhg.rss"),
-                     feedparser.parse("https://podcasts.files.bbci.co.uk/b006qykl.rss"),
-                     feedparser.parse("https://podcasts.files.bbci.co.uk/p0683ms3.rss"),
-
-                     ]:
+    for NewsFeed in [feedparser.parse(x) for x in FEEDS['bbc'].values()]:
         title = NewsFeed.feed.title
         print(len(NewsFeed.entries))
 
@@ -32,12 +29,7 @@ def get_episode_information():
 def get_episode_information_rihp():
     data = []
 
-    for NewsFeed in [
-                    feedparser.parse("https://feeds.megaphone.fm/GLT4787413333"), # rhip
-                     feedparser.parse("https://feeds.megaphone.fm/empirepodcast"), # empire
-                     feedparser.parse("https://feeds.megaphone.fm/NSR8236478683"), # short
-                     feedparser.parse("https://feeds.megaphone.fm/TECO4776134998"), # what the brit
-                     ]:
+    for NewsFeed in[feedparser.parse(x) for x in FEEDS['megaphone'].values()]:
         title = NewsFeed.feed.title
         print(len(NewsFeed.entries))
 
@@ -55,9 +47,7 @@ def get_episode_information_rihp():
 def get_episode_information_acast():
     data = []
 
-    for NewsFeed in [
-                     feedparser.parse("https://feeds.acast.com/public/shows/c939f8d1-c4bc-478e-8bb9-e5343f9a7ab5"), # history hit
-                     ]:
+    for NewsFeed in [feedparser.parse(x) for x in FEEDS['acast'].values()]:
         title = NewsFeed.feed.title
         print(len(NewsFeed.entries))
 

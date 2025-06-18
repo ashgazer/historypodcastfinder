@@ -5,9 +5,12 @@
   <title>Podcast Search</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>function toggleFilters() {
+  const box = document.getElementById("filterBox");
+  box.classList.toggle("hidden");
+}</script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col items-center pt-10 px-4">
-
   <h1 class="text-3xl sm:text-4xl font-bold mb-6 text-center text-blue-700">
     🎙️ History Podcast Topic Search
   </h1>
@@ -26,8 +29,68 @@
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow w-full sm:w-auto">
         Search
       </button>
+      <button
+      onclick="toggleFilters()"
+      title="Filters"
+      class="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg shadow w-full sm:w-auto">
+      ⚙️
+      </button>
     </div>
   </div>
+<div id="filterBox" class="w-full max-w-xl mb-6 bg-white border border-gray-300 p-4 rounded-lg shadow space-y-4 hidden">
+  <div class="flex flex-col sm:flex-row gap-4">
+    <div class="flex-1">
+      <label for="dateFilter" class="block text-sm font-medium text-gray-700">Published After</label>
+      <input type="date" id="dateFilter" class="w-full mt-1 p-2 border border-gray-300 rounded-md" />
+    </div>
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Podcast Shows</label>
+    <div id="topicFilter" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="You're Dead to Me" class="tag-checkbox">
+        <span>You're Dead to Me</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="In Our Time" class="tag-checkbox">
+        <span>In Our Time</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="How to Invent a Country" class="tag-checkbox">
+        <span>How to Invent a Country</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="The Rest Is History" class="tag-checkbox">
+        <span>The Rest Is History</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="Empire" class="tag-checkbox">
+        <span>Empire</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="Short History Of..." class="tag-checkbox">
+        <span>Short History Of...</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="Stuff The British Stole" class="tag-checkbox">
+        <span>Stuff The British Stole</span>
+      </label>
+
+      <label class="flex items-center space-x-2">
+        <input type="checkbox" value="Dan Snow's History Hit" class="tag-checkbox">
+        <span>Dan Snow's History Hit</span>
+      </label>
+
+    </div>
+  </div>
+</div>
 
   <!-- Results -->
   <div id="results" class="w-full max-w-2xl space-y-6">

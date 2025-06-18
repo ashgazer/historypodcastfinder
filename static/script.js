@@ -131,7 +131,7 @@ function playEpisodeAt(index) {
 
   audioPlayer.src = ep.audio_url;
   document.getElementById("playerContainer").classList.remove("hidden");
-  document.getElementById("nowPlaying").textContent = `Now Playing: ${ep.title}`;
+  document.getElementById("nowPlaying").textContent = `${ep.title}`;
 
   // ⏪ Restore saved time if available
   const savedTime = localStorage.getItem(`position-${currentEpisodeId}`);
@@ -207,4 +207,17 @@ function toggleFullSummary(button) {
     shortEl.classList.remove('hidden');
     button.textContent = 'Show More';
   }
+}
+
+function triggerUpdate() {
+  fetch('/update')
+    .then(response => response.json())
+    .then(data => {
+      console.log("Update response:", data);
+      alert(data.message); // Optional: show user feedback
+    })
+    .catch(error => {
+      console.error("Error updating:", error);
+      alert("Failed to update episodes.");
+    });
 }

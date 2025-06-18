@@ -1,3 +1,5 @@
+import os
+import subprocess
 import time
 
 import feedparser
@@ -152,6 +154,11 @@ def remove_radio_edit_episodes_from_your_dead_to_me():
 
 
 def update_db():
+    result = subprocess.run(['rm', '-f','podcast.db'], capture_output=True, text=True)
+
+    # Print output
+    print(result.stdout)  # Standard output
+    print(result.stderr)  # Standard error (if any)
     episodes = get_episode_information()
     save_to_database(episodes)
     remove_radio_edit_episodes_from_your_dead_to_me()

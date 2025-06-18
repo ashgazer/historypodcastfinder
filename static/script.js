@@ -73,12 +73,26 @@ function formatTime(time) {
 
 function searchEpisodes() {
   const query = document.getElementById("searchBox").value.trim();
+
+
+  const date = document.getElementById("dateFilter")?.value;
+  const selectedTags = Array.from(document.querySelectorAll(".tag-checkbox:checked")).map(cb => cb.value);
+
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = '';
 
-  if (!query) return;
 
-  fetch(`/search?q=${encodeURIComponent(query)}`)
+
+  if (!query) return;
+  const params = new URLSearchParams();
+  if (query) params.append('q', query);
+  if (date) params.append('after', date);
+	if (selectedTags.length > 0) {
+	  selectedTags.forEach(tag => params.append('tag', tag));
+	}
+
+
+  fetch(`/search?${params.toString()}`)
     .then(res => res.json())
     .then(episodes => {
       if (episodes.length === 0) {

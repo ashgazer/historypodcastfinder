@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, render_template
 import sqlite3
 
+from get_feed_info import update_db
+
 app = Flask(__name__)
 
 DB_PATH = 'podcast.db'
@@ -38,6 +40,17 @@ def search():
 
     results = query_episodes(query)
     return jsonify(results)
+
+@app.route('/update')
+def update():
+    """
+    This endpoint is for updating the database with new episodes.
+    In a real application, you would implement logic to fetch new episodes
+    and save them to the database.
+    """
+    update_db()
+    return jsonify({"status": "success", "message": "Database updated successfully."})
+
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)

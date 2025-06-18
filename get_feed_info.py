@@ -150,16 +150,19 @@ def remove_radio_edit_episodes_from_your_dead_to_me():
     conn.commit()  # You must commit to persist changes
     conn.close()
 
-if __name__ == "__main__":
+
+def update_db():
     episodes = get_episode_information()
     save_to_database(episodes)
     remove_radio_edit_episodes_from_your_dead_to_me()
-
     episodes = get_episode_information_rihp()
     save_to_database(episodes)
-
     episodes = get_episode_information_acast()
     save_to_database(episodes)
+
+
+if __name__ == "__main__":
+    update_db()
 
     # pod_data = read_from_database()
     #

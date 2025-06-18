@@ -49,7 +49,18 @@ def update():
     and save them to the database.
     """
     update_db()
-    return jsonify({"status": "success", "message": "Database updated successfully."})
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT  max(published)
+        FROM episodes
+    """)
+    results = c.fetchone()
+    conn.close()
+    return jsonify(
+        {"status": "success", "message": "Database updated successfully.",
+         "last_updated": results[0] if results else None}
+    )
 
 
 if __name__ == '__main__':
